@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SA 10
+
+struct SA
+{
+    int spi;
+    char src[20];
+    char dest[20];
+    char algorithm[20];
+};
+
+struct SA sa[MAX_SA];
+int count = 0;
+
+void createSA()
+{
+    if (count >= MAX_SA)
+    {
+        printf("SA table is full.\n");
+        return;
+    }
+
+    printf("Enter SPI: ");
+    scanf("%d", &sa[count].spi);
+
+    printf("Enter Source IP: ");
+    scanf("%s", sa[count].src);
+
+    printf("Enter Destination IP: ");
+    scanf("%s", sa[count].dest);
+
+    printf("Enter Encryption Algorithm: ");
+    scanf("%s", sa[count].algorithm);
+
+    count++;
+    printf("Security Association created successfully.\n");
+}
+
+void lookupSA()
+{
+    int spi, i;
+
+    printf("Enter SPI to lookup: ");
+    scanf("%d", &spi);
+
+    for (i = 0; i < count; i++)
+    {
+        if (sa[i].spi == spi)
+        {
+            printf("\nSA Found\n");
+            printf("SPI: %d\n", sa[i].spi);
+            printf("Source IP: %s\n", sa[i].src);
+            printf("Destination IP: %s\n", sa[i].dest);
+            printf("Algorithm: %s\n", sa[i].algorithm);
+            return;
+        }
+    }
+
+    printf("SA not found.\n");
+}
+
+void deleteSA()
+{
+    int spi, i, j;
+
+    printf("Enter SPI to delete: ");
+    scanf("%d", &spi);
+
+    for (i = 0; i < count; i++)
+    {
+        if (sa[i].spi == spi)
+        {
+            for (j = i; j < count - 1; j++)
+                sa[j] = sa[j + 1];
+
+            count--;
+            printf("Security Association deleted successfully.\n");
+            return;
+        }
+    }
+
+    printf("SA not found.\n");
+}
+
+int main()
+{
+    int choice;
+
+    do
+    {
+        printf("\n--- IPSec Security Association ---\n");
+        printf("1. Create SA\n");
+        printf("2. Lookup SA\n");
+        printf("3. Delete SA\n");
+        printf("4. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                createSA();
+                break;
+
+            case 2:
+                lookupSA();
+                break;
+
+            case 3:
+                deleteSA();
+                break;
+
+            case 4:
+                printf("Exiting...\n");
+                break;
+
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
