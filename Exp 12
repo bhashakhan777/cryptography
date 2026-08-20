@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int modInverse(int a)
+{
+    int i;
+    for(i=1;i<26;i++)
+        if((a*i)%26==1)
+            return i;
+    return -1;
+}
+
+int main()
+{
+    char text[200], p[200];
+    int i,n=0;
+    int a=9,b=4,c=5,d=7;
+    int det,inv;
+    int x,y,e1,e2;
+
+    printf("Enter plaintext: ");
+    fgets(text,sizeof(text),stdin);
+
+    for(i=0;text[i];i++)
+        if(isalpha(text[i]))
+            p[n++]=tolower(text[i])-'a';
+
+    if(n%2) p[n++]=23;
+
+    printf("\nCiphertext: ");
+
+    for(i=0;i<n;i+=2)
+    {
+        x=p[i];
+        y=p[i+1];
+
+        e1=(a*x+b*y)%26;
+        e2=(c*x+d*y)%26;
+
+        printf("%c%c",e1+'A',e2+'A');
+    }
+
+    det=(a*d-b*c+26)%26;
+    inv=modInverse(det);
+
+    if(inv==-1)
+    {
+        printf("\nKey cannot be inverted.");
+        return 0;
+    }
+
+    printf("\n\nDecrypted text: ");
+
+    for(i=0;i<n;i+=2)
+    {
+        x=p[i];
+        y=p[i+1];
+
+        e1=(inv*(d*x-b*y+26))%26;
+        e2=(inv*(-c*x+a*y+26))%26;
+
+        printf("%c%c",e1+'a',e2+'a');
+    }
+
+    return 0;
+}
