@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <string.h>
+
+int gcd(int a, int b)
+{
+    while(b)
+    {
+        int t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+int modInverse(int a)
+{
+    int i;
+    for(i = 1; i < 26; i++)
+        if((a * i) % 26 == 1)
+            return i;
+
+    return -1;
+}
+
+int main()
+{
+    char cipher[1000];
+    int a, b, inv, i, p;
+
+    printf("Enter ciphertext: ");
+    fgets(cipher, sizeof(cipher), stdin);
+
+    printf("\nTrying all valid affine keys:\n");
+
+    for(a = 1; a < 26; a++)
+    {
+        if(gcd(a,26) != 1)
+            continue;
+
+        inv = modInverse(a);
+
+        for(b = 0; b < 26; b++)
+        {
+            printf("\na=%d b=%d : ", a, b);
+
+            for(i = 0; cipher[i] != '\0'; i++)
+            {
+                if(cipher[i] >= 'A' && cipher[i] <= 'Z')
+                {
+                    p = inv * ((cipher[i]-'A'-b+26)%26) % 26;
+                    printf("%c", p+'A');
+                }
+                else
+                    printf("%c", cipher[i]);
+            }
+        }
+    }
+
+    return 0;
+}
