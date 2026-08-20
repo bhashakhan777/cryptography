@@ -1,0 +1,52 @@
+#include <stdio.h>
+
+int modInverse(int a)
+{
+    int i;
+    for(i=1;i<26;i++)
+        if((a*i)%26==1)
+            return i;
+    return -1;
+}
+
+int main()
+{
+    int p[2][2], c[2][2];
+    int det, inv;
+    int k11,k12,k21,k22;
+
+    printf("Enter 2 plaintext pairs:\n");
+    scanf("%d%d%d%d",
+          &p[0][0],&p[0][1],
+          &p[1][0],&p[1][1]);
+
+    printf("Enter corresponding ciphertext pairs:\n");
+    scanf("%d%d%d%d",
+          &c[0][0],&c[0][1],
+          &c[1][0],&c[1][1]);
+
+    det=(p[0][0]*p[1][1]-p[0][1]*p[1][0]+26)%26;
+    inv=modInverse(det);
+
+    if(inv==-1)
+    {
+        printf("Plaintext matrix has no inverse.\n");
+        return 0;
+    }
+
+    k11=(c[0][0]*p[1][1]-c[0][1]*p[1][0])*inv%26;
+    k12=(-c[0][0]*p[0][1]+c[0][1]*p[0][0])*inv%26;
+    k21=(c[1][0]*p[1][1]-c[1][1]*p[1][0])*inv%26;
+    k22=(-c[1][0]*p[0][1]+c[1][1]*p[0][0])*inv%26;
+
+    k11=(k11+26)%26;
+    k12=(k12+26)%26;
+    k21=(k21+26)%26;
+    k22=(k22+26)%26;
+
+    printf("Recovered Key Matrix:\n");
+    printf("%d %d\n",k11,k12);
+    printf("%d %d\n",k21,k22);
+
+    return 0;
+}
