@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+int main()
+{
+    unsigned long long key;
+    unsigned int C,D;
+    int i;
+
+    printf("Enter 56-bit key in hexadecimal: ");
+    scanf("%llx",&key);
+
+    C=(key>>28)&0x0FFFFFFF;
+    D=key&0x0FFFFFFF;
+
+    printf("\nFirst 28-bit subset  C = %07X\n",C);
+    printf("Second 28-bit subset D = %07X\n",D);
+
+    printf("\nSubkey generation:\n");
+
+    for(i=1;i<=16;i++)
+    {
+        C=((C<<1)|(C>>27))&0x0FFFFFFF;
+        D=((D<<1)|(D>>27))&0x0FFFFFFF;
+
+        printf("K%d: C=%07X D=%07X\n",i,C,D);
+    }
+
+    return 0;
+}
