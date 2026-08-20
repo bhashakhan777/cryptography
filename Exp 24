@@ -1,0 +1,47 @@
+#include <stdio.h>
+
+int gcd(int a,int b)
+{
+    while(b)
+    {
+        int t=a%b;
+        a=b;
+        b=t;
+    }
+    return a;
+}
+
+int inverse(int e,int phi)
+{
+    int d=1;
+
+    while((e*d)%phi!=1)
+        d++;
+
+    return d;
+}
+
+int main()
+{
+    int n=3599,e=31;
+    int p,q,phi,d;
+
+    for(p=2;p<n;p++)
+    {
+        if(n%p==0)
+        {
+            q=n/p;
+            break;
+        }
+    }
+
+    phi=(p-1)*(q-1);
+    d=inverse(e,phi);
+
+    printf("p = %d\n",p);
+    printf("q = %d\n",q);
+    printf("phi(n) = %d\n",phi);
+    printf("Private key d = %d\n",d);
+
+    return 0;
+}
