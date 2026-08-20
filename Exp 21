@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+
+unsigned char pad(unsigned char x)
+{
+    return x;
+}
+
+int main()
+{
+    unsigned char p[100],iv=0xAA,key=0x5A;
+    int n,i;
+
+    printf("Enter plaintext: ");
+    fgets((char *)p,sizeof(p),stdin);
+
+    n=strlen((char *)p);
+
+    if(n>0 && p[n-1]=='\n')
+        n--;
+
+    p[n++]=0x80;
+
+    while(n%4!=0)
+        p[n++]=0x00;
+
+    printf("\nECB:\n");
+    for(i=0;i<n;i++)
+        printf("%02X ",p[i]^key);
+
+    printf("\n\nCBC:\n");
+    for(i=0;i<n;i++)
+    {
+        iv=(p[i]^iv)^key;
+        printf("%02X ",iv);
+    }
+
+    printf("\n\nCFB:\n");
+    iv=0xAA;
+
+    for(i=0;i<n;i++)
+    {
+        iv=(iv^key)^p[i];
+        printf("%02X ",iv);
+    }
+
+    printf("\n\nPadding block helps distinguish a complete message from a padded message.\n");
+
+    return 0;
+}
