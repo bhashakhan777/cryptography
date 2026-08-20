@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+unsigned int f(unsigned int x,unsigned int k)
+{
+    x^=k;
+    x=(x<<3)|(x>>29);
+    return x;
+}
+
+unsigned int des3(unsigned int x,
+                  unsigned int k1,
+                  unsigned int k2,
+                  unsigned int k3)
+{
+    x=f(x,k1);
+    x=f(x,k2);
+    x=f(x,k3);
+    return x;
+}
+
+int main()
+{
+    unsigned int p[10],c[10],iv,k1,k2,k3;
+    int n,i;
+
+    printf("Enter number of blocks: ");
+    scanf("%d",&n);
+
+    printf("Enter IV: ");
+    scanf("%x",&iv);
+
+    printf("Enter keys K1 K2 K3: ");
+    scanf("%x%x%x",&k1,&k2,&k3);
+
+    printf("Enter plaintext blocks: ");
+    for(i=0;i<n;i++)
+        scanf("%x",&p[i]);
+
+    for(i=0;i<n;i++)
+    {
+        p[i]^=iv;
+        c[i]=des3(p[i],k1,k2,k3);
+        iv=c[i];
+    }
+
+    printf("CBC Ciphertext:\n");
+    for(i=0;i<n;i++)
+        printf("%08X ",c[i]);
+
+    return 0;
+}
