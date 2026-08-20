@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <string.h>
+
+void encryptDecrypt(char data[], char key)
+{
+    for (int i = 0; data[i] != '\0'; i++)
+        data[i] ^= key;
+}
+
+int main()
+{
+    char payload[100];
+    char key = 'K';
+
+    printf("Enter IP packet payload: ");
+    fgets(payload, sizeof(payload), stdin);
+
+    payload[strcspn(payload, "\n")] = '\0';
+
+    encryptDecrypt(payload, key);
+    printf("Encrypted Payload: %s\n", payload);
+
+    encryptDecrypt(payload, key);
+    printf("Decrypted Payload: %s\n", payload);
+
+    return 0;
+}
