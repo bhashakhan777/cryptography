@@ -1,0 +1,21 @@
+#include <stdio.h>
+
+int main()
+{
+    int lanes=25;
+    int rate=1024;
+    int capacity=1600-rate;
+    int capacityLanes=capacity/64;
+
+    printf("SHA-3 state size = 1600 bits\n");
+    printf("Block size = %d bits\n",rate);
+    printf("Capacity = %d bits\n",capacity);
+    printf("Capacity lanes = %d\n",capacityLanes);
+
+    printf("\nInitial capacity lanes are all zero.\n");
+    printf("Permutation is ignored as specified.\n");
+    printf("Therefore, the original zero capacity lanes remain zero forever.\n");
+    printf("Time required for all capacity lanes to become nonzero: NEVER.\n");
+
+    return 0;
+}
