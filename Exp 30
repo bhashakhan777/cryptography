@@ -1,0 +1,34 @@
+#include <stdio.h>
+
+unsigned char encrypt(unsigned char x,unsigned char key)
+{
+    return x^key;
+}
+
+int main()
+{
+    unsigned char X,T,second,mac,forged;
+    unsigned char key=0x5A;
+
+    printf("Enter one-block message X: ");
+    scanf("%hhx",&X);
+
+    T=encrypt(X,key);
+
+    printf("MAC(K,X) = %02X\n",T);
+
+    second=X^T;
+
+    mac=encrypt(second^T,key);
+
+    printf("Second block (X XOR T) = %02X\n",second);
+
+    printf("MAC(K, X || (X XOR T)) = %02X\n",mac);
+
+    forged=T;
+
+    printf("\nForged message: X || (X XOR T)\n");
+    printf("Forged MAC: %02X\n",forged);
+
+    return 0;
+}
