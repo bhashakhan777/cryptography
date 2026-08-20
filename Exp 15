@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main()
+{
+    char c[1000], p[1000];
+    int freq[26] = {0}, order[26], n, i, j, t, top;
+
+    printf("Enter ciphertext: ");
+    fgets(c, sizeof(c), stdin);
+
+    printf("How many possible plaintexts? ");
+    scanf("%d", &top);
+
+    for(i = 0; c[i]; i++)
+        if(isalpha(c[i]))
+            freq[toupper(c[i])-'A']++;
+
+    for(i=0;i<26;i++) order[i]=i;
+
+    for(i=0;i<26;i++)
+        for(j=i+1;j<26;j++)
+            if(freq[order[j]] > freq[order[i]])
+            {
+                t=order[i];
+                order[i]=order[j];
+                order[j]=t;
+            }
+
+    printf("\nPossible plaintexts:\n");
+
+    for(n=0;n<top && n<26;n++)
+    {
+        int shift=(order[n]-('E'-'A')+26)%26;
+
+        for(i=0;c[i];i++)
+        {
+            if(isalpha(c[i]))
+            {
+                int x=toupper(c[i])-'A';
+                p[i]=(x-shift+26)%26+'A';
+            }
+            else
+                p[i]=c[i];
+        }
+        p[i]='\0';
+
+        printf("%2d. %s\n",n+1,p);
+    }
+
+    return 0;
+}
