@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+int main()
+{
+    unsigned int p[4],c[4],iv;
+    int i,n;
+
+    printf("Enter number of blocks: ");
+    scanf("%d",&n);
+
+    printf("Enter plaintext blocks in hexadecimal:\n");
+    for(i=0;i<n;i++)
+        scanf("%x",&p[i]);
+
+    printf("Enter IV: ");
+    scanf("%x",&iv);
+
+    printf("\nECB:\n");
+    for(i=0;i<n;i++)
+    {
+        c[i]=p[i]^0xAAAAAAAA;
+        printf("%08X ",c[i]);
+    }
+
+    printf("\n\nCBC:\n");
+
+    for(i=0;i<n;i++)
+    {
+        c[i]=(p[i]^iv)^0xAAAAAAAA;
+        iv=c[i];
+        printf("%08X ",c[i]);
+    }
+
+    printf("\n\nCBC: An error in C1 affects P1 and P2 only.\n");
+    printf("Blocks after P2 are not affected.\n");
+    printf("An error in P1 propagates through all following CBC ciphertext blocks.\n");
+
+    return 0;
+}
