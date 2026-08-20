@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+int gcd(int a,int b)
+{
+    while(b)
+    {
+        int t=a%b;
+        a=b;
+        b=t;
+    }
+    return a;
+}
+
+int main()
+{
+    int p,q,n,phi,e,d,newE,newD;
+
+    printf("Enter p and q: ");
+    scanf("%d%d",&p,&q);
+
+    n=p*q;
+    phi=(p-1)*(q-1);
+
+    printf("Enter old public key e: ");
+    scanf("%d",&e);
+
+    printf("Enter old private key d: ");
+    scanf("%d",&d);
+
+    printf("Enter new public key e: ");
+    scanf("%d",&newE);
+
+    if(gcd(newE,phi)!=1)
+    {
+        printf("Invalid new public key.\n");
+        return 0;
+    }
+
+    newD=1;
+
+    while((newE*newD)%phi!=1)
+        newD++;
+
+    printf("New modulus = %d\n",n);
+    printf("New public key = %d\n",newE);
+    printf("New private key = %d\n",newD);
+
+    printf("\nGenerating new keys with the same modulus is unsafe if the old factorization is compromised.\n");
+
+    return 0;
+}
