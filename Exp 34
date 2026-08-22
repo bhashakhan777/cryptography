@@ -1,0 +1,85 @@
+#include <stdio.h>
+
+#define SIZE 8
+
+void encryptBlock(int *p, int *k, int *c)
+{
+    for (int i = 0; i < SIZE; i++)
+        c[i] = p[i] ^ k[i];
+}
+
+void ecb(int p[], int k[], int c[], int n)
+{
+    for (int i = 0; i < n; i++)
+        encryptBlock(&p[i * SIZE], k, &c[i * SIZE]);
+}
+
+void cbc(int p[], int k[], int iv[], int c[], int n)
+{
+    int temp[SIZE];
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+            temp[j] = p[i * SIZE + j] ^ iv[j];
+
+        encryptBlock(temp, k, &c[i * SIZE]);
+
+        for (int j = 0; j < SIZE; j++)
+            iv[j] = c[i * SIZE + j];
+    }
+}
+
+void cfb(int p[], int k[], int iv[], int c[], int n)
+{
+    int temp[SIZE];
+
+    for (int i = 0; i < n; i++)
+    {
+        encryptBlock(iv, k, temp);
+
+        for (int j = 0; j < SIZE; j++)
+            c[i * SIZE + j] = p[i * SIZE + j] ^ temp[j];
+
+        for (int j = 0; j < SIZE; j++)
+            iv[j] = c[i * SIZE + j];
+    }
+}
+
+void display(int c[], int n)
+{
+    for (int i = 0; i < n * SIZE; i++)
+        printf("%d ", c[i]);
+
+    printf("\n");
+}
+
+int main()
+{
+    int plaintext[16] =
+    {
+        1,0,1,0,1,1,0,0,
+        1,1,0,1,0,0,1,0
+    };
+
+    int key[8] = {1,0,1,1,0,1,0,1};
+    int iv[8]  = {0,1,0,1,0,1,0,1};
+
+    int c[16];
+
+    printf("ECB: ");
+    ecb(plaintext, key, c, 2);
+    display(c, 2);
+
+    printf("CBC: ");
+    cbc(plaintext, key, iv, c, 2);
+    display(c, 2);
+
+    int iv2[8] = {0,1,0,1,0,1,0,1};
+
+    printf("CFB: ");
+    cfb(plaintext, key, iv2, c, 2);
+    display(c, 2);
+
+    return 0;
+}
