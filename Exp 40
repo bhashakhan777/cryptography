@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <string.h>
+
+char english[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+
+int main()
+{
+    char cipher[1000];
+    int frequency[26] = {0};
+    int used[26] = {0};
+    int n;
+
+    printf("Enter ciphertext:\n");
+    fgets(cipher, sizeof(cipher), stdin);
+
+    printf("Enter number of possible plaintexts: ");
+    scanf("%d", &n);
+
+    if (n > 10)
+        n = 10;
+
+    for (int i = 0; cipher[i] != '\0'; i++)
+    {
+        if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+            frequency[cipher[i] - 'A']++;
+
+        else if (cipher[i] >= 'a' && cipher[i] <= 'z')
+            frequency[cipher[i] - 'a']++;
+    }
+
+    printf("\nTop %d possible mappings:\n", n);
+
+    for (int candidate = 0; candidate < n; candidate++)
+    {
+        int max = -1;
+        int letter = -1;
+
+        for (int i = 0; i < 26; i++)
+        {
+            if (!used[i] && frequency[i] > max)
+            {
+                max = frequency[i];
+                letter = i;
+            }
+        }
+
+        if (letter == -1)
+            break;
+
+        used[letter] = 1;
+
+        printf("Candidate %d: %c -> %c\n",
+               candidate + 1,
+               letter + 'A',
+               english[candidate]);
+    }
+
+    return 0;
+}
