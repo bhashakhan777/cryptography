@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int modInverse(int a, int m)
+{
+    int i;
+
+    for (i = 1; i < m; i++)
+        if ((a * i) % m == 1)
+            return i;
+
+    return -1;
+}
+
+int main()
+{
+    int p = 23, q = 11, g = 2;
+    int x = 3;              // private key
+    int y;
+    int h = 7;              // message hash
+    int k, r, s;
+    int i;
+
+    srand(time(NULL));
+
+    y = 1;
+    for (i = 0; i < x; i++)
+        y = (y * g) % p;
+
+    printf("DSA Demonstration\n");
+    printf("Private key x = %d\n", x);
+    printf("Public key y = %d\n", y);
+
+    for (i = 1; i <= 2; i++)
+    {
+        k = (rand() % (q - 1)) + 1;
+
+        r = 1;
+        for (int j = 0; j < k; j++)
+            r = (r * g) % p;
+
+        r = r % q;
+
+        s = (modInverse(k, q) * (h + x * r)) % q;
+
+        printf("\nSignature %d:\n", i);
+        printf("Random k = %d\n", k);
+        printf("r = %d\n", r);
+        printf("s = %d\n", s);
+    }
+
+    return 0;
+}
