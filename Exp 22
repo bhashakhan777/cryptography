@@ -1,1 +1,251 @@
+#include <stdio.h>
+#include <string.h>
 
+int P10[] = {3,5,2,7,4,10,1,9,8,6};
+int P8[]  = {6,3,7,4,8,5,10,9};
+int IP[]  = {2,6,3,1,4,8,5,7};
+int IP_INV[] = {4,1,3,5,7,2,8,6};
+int EP[] = {4,1,2,3,2,3,4,1};
+int P4[] = {2,4,3,1};
+
+int S0[4][4] = {
+    {1,0,3,2},
+    {3,2,1,0},
+    {0,2,1,3},
+    {3,1,3,2}
+};
+
+int S1[4][4] = {
+    {0,1,2,3},
+    {2,0,1,3},
+    {3,0,1,0},
+    {2,1,0,3}
+};
+
+void permute(char *in, char *out, int *table, int n)
+{
+    for(int i = 0; i < n; i++)
+        out[i] = in[table[i] - 1];
+
+    out[n] = '\0';
+}
+
+void leftShift(char *s, int n)
+{
+    char temp[10];
+
+    for(int i = 0; i < 5; i++)
+        temp[i] = s[(i+n)%5];
+
+    for(int i = 0; i < 5; i++)
+        s[i] = temp[i];
+}
+
+void generateKeys(char *key, char *K1, char *K2)
+{
+    char p10[11], left[6], right[6], temp[11];
+
+    permute(key, p10, P10, 10);
+
+    strncpy(left, p10, 5);
+    left[5] = '\0';
+
+    strncpy(right, p10+5, 5);
+    right[5] = '\0';
+
+    leftShift(left,1);
+    leftShift(right,1);
+
+    strcpy(temp,left);
+    strcat(temp,right);
+
+    permute(temp,K1,P8,8);
+
+    leftShift(left,2);
+    leftShift(right,2);
+
+    strcpy(temp,left);
+    strcat(temp,right);
+
+    permute(temp,K2,P8,8);
+}
+
+void XOR(char *a, char *b, char *result, int n)
+{
+    for(int i = 0; i < n; i++)
+        result[i] = (a[i] == b[i]) ? '0' : '1';
+
+    result[n] = '\0';
+}
+
+void sbox(char *bits, int S[4][4], char *output)
+{
+    int row, col, value;
+
+    row = (bits[0]-'0') * 2 + (bits[3]-'0');
+    col = (bits[1]-'0') * 2 + (bits[2]-'0');
+
+    value = S[row][col];
+
+    output[0] = (value / 2) + '0';
+    output[1] = (value % 2) + '0';
+    output[2] = '\0';
+}
+
+void fk(char *bits, char *key, char *result)
+{
+    char left[5], right[5];
+    char ep[9], x[9];
+    char a[5], b[5];
+    char s0[3], s1[3];
+    char temp[5], p4[5];
+
+    strncpy(left,bits,4);
+    left[4]='\0';
+
+    strncpy(right,bits+4,4);
+    right[4]='\0';
+
+    permute(right,ep,EP,8);
+
+    XOR(ep,key,x,8);
+
+    strncpy(a,x,4);
+    a[4]='\0';
+
+    strncpy(b,x+4,4);
+    b[4]='\0';
+
+    sbox(a,S0,s0);
+    sbox(b,S1,s1);
+
+    strcpy(temp,s0);
+    strcat(temp,s1);
+
+    permute(temp,p4,P4,4);
+
+    XOR(left,p4,left,4);
+
+    strcpy(result,left);
+    strcat(result,right);
+}
+
+void SDES_Encrypt(char *plaintext, char *key, char *cipher)
+{
+    char K1[9],K2[9];
+    char ip[9], temp[9], swapped[9], result[9];
+
+    generateKeys(key,K1,K2);
+
+    permute(plaintext,ip,IP,8);
+
+    fk(ip,K1,temp);
+
+    strncpy(swapped,temp+4,4);
+    swapped[4]='\0';
+
+    strncat(swapped,temp,4);
+
+    fk(swapped,K2,result);
+
+    permute(result,cipher,IP_INV,8);
+}
+
+void SDES_Decrypt(char *cipher, char *key, char *plaintext)
+{
+    char K1[9],K2[9];
+    char ip[9], temp[9], swapped[9], result[9];
+
+    generateKeys(key,K1,K2);
+
+    permute(cipher,ip,IP,8);
+
+    fk(ip,K2,temp);
+
+    strncpy(swapped,temp+4,4);
+    swapped[4]='\0';
+
+    strncat(swapped,temp,4);
+
+    fk(swapped,K1,result);
+
+    permute(result,plaintext,IP_INV,8);
+}
+
+void CBC_Encrypt(char *plaintext, char *ciphertext,
+                 char *key, char *IV)
+{
+    char block[9], xored[9], encrypted[9];
+    char previous[9];
+
+    strcpy(previous,IV);
+
+    for(int i=0; i<16; i+=8)
+    {
+        strncpy(block,plaintext+i,8);
+        block[8]='\0';
+
+        XOR(block,previous,xored,8);
+
+        SDES_Encrypt(xored,key,encrypted);
+
+        strncpy(ciphertext+i,encrypted,8);
+
+        strcpy(previous,encrypted);
+    }
+
+    ciphertext[16]='\0';
+}
+
+void CBC_Decrypt(char *ciphertext, char *plaintext,
+                 char *key, char *IV)
+{
+    char block[9], decrypted[9], xored[9];
+    char previous[9];
+
+    strcpy(previous,IV);
+
+    for(int i=0; i<16; i+=8)
+    {
+        strncpy(block,ciphertext+i,8);
+        block[8]='\0';
+
+        SDES_Decrypt(block,key,decrypted);
+
+        XOR(decrypted,previous,xored,8);
+
+        strncpy(plaintext+i,xored,8);
+
+        strcpy(previous,block);
+    }
+
+    plaintext[16]='\0';
+}
+
+int main()
+{
+    char plaintext[] = "0000000100100011";
+    char key[] = "0111111101";
+    char IV[] = "10101010";
+
+    char ciphertext[17];
+    char decrypted[17];
+
+    CBC_Encrypt(plaintext,ciphertext,key,IV);
+
+    printf("CBC Encryption\n");
+    printf("-------------------------\n");
+    printf("Plaintext  : %s\n",plaintext);
+    printf("Key        : %s\n",key);
+    printf("IV         : %s\n",IV);
+    printf("Ciphertext : %s\n",ciphertext);
+
+    CBC_Decrypt(ciphertext,decrypted,key,IV);
+
+    printf("\nCBC Decryption\n");
+    printf("-------------------------\n");
+    printf("Ciphertext : %s\n",ciphertext);
+    printf("Decrypted  : %s\n",decrypted);
+
+    return 0;
+}
