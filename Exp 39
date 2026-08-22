@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <string.h>
+
+char *decrypt(char *cipher, int shift, char *plain)
+{
+    int i;
+
+    for (i = 0; cipher[i] != '\0'; i++)
+    {
+        if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+            plain[i] = ((cipher[i] - 'A' - shift + 26) % 26) + 'A';
+        else
+            plain[i] = cipher[i];
+    }
+
+    plain[i] = '\0';
+
+    return plain;
+}
+
+int score(char *text)
+{
+    char common[] = "ETAOIN";
+    int s = 0;
+
+    for (int i = 0; text[i] != '\0'; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            if (text[i] == common[j])
+                s++;
+        }
+    }
+
+    return s;
+}
+
+int main()
+{
+    char cipher[500];
+    char plain[500];
+    char candidates[26][500];
+    int scores[26];
+
+    printf("Enter ciphertext in uppercase:\n");
+    fgets(cipher, sizeof(cipher), stdin);
+
+    for (int shift = 0; shift < 26; shift++)
+    {
+        decrypt(cipher, shift, candidates[shift]);
+        scores[shift] = score(candidates[shift]);
+    }
+
+    printf("\nPossible plaintexts in rough order:\n");
+
+    for (int count = 0; count < 10; count++)
+    {
+        int best = -1;
+
+        for (int i = 0; i < 26; i++)
+        {
+            if (scores[i] >= 0 &&
+                (best == -1 || scores[i] > scores[best]))
+                best = i;
+        }
+
+        if (best == -1)
+            break;
+
+        printf("\nCandidate %d (Shift %d): %s",
+               count + 1, best, candidates[best]);
+
+        scores[best] = -1;
+    }
+
+    return 0;
+}
