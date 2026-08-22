@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <string.h>
+
+char freqOrder[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+
+int main()
+{
+    char cipher[1000];
+    int freq[26] = {0};
+    int order[26];
+    int top;
+
+    printf("Enter ciphertext:\n");
+    fgets(cipher, sizeof(cipher), stdin);
+
+    printf("How many possible plaintexts? ");
+    scanf("%d", &top);
+
+    for (int i = 0; cipher[i] != '\0'; i++)
+    {
+        if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+            freq[cipher[i] - 'A']++;
+
+        if (cipher[i] >= 'a' && cipher[i] <= 'z')
+            freq[cipher[i] - 'a']++;
+    }
+
+    for (int i = 0; i < 26; i++)
+        order[i] = i;
+
+    for (int i = 0; i < 26; i++)
+    {
+        for (int j = i + 1; j < 26; j++)
+        {
+            if (freq[order[i]] < freq[order[j]])
+            {
+                int temp = order[i];
+                order[i] = order[j];
+                order[j] = temp;
+            }
+        }
+    }
+
+    if (top > 10)
+        top = 10;
+
+    printf("\nPossible plaintext mappings:\n");
+
+    for (int n = 0; n < top; n++)
+    {
+        printf("\nCandidate %d:\n", n + 1);
+
+        for (int i = 0; i < 26; i++)
+        {
+            printf("%c->%c ",
+                   order[i] + 'A',
+                   freqOrder[(i + n) % 26]);
+        }
+
+        printf("\n");
+    }
+
+    return 0;
+}
