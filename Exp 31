@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdint.h>
+
+uint64_t leftShift64(uint64_t x)
+{
+    return x << 1;
+}
+
+uint64_t generateK1_64(uint64_t L)
+{
+    uint64_t K1 = leftShift64(L);
+
+    if (L & 0x8000000000000000ULL)
+        K1 ^= 0x1B;
+
+    return K1;
+}
+
+uint64_t generateK2_64(uint64_t K1)
+{
+    uint64_t K2 = leftShift64(K1);
+
+    if (K1 & 0x8000000000000000ULL)
+        K2 ^= 0x1B;
+
+    return K2;
+}
+
+int main()
+{
+    uint64_t L, K1, K2;
+
+    printf("Enter 64-bit block in hexadecimal: ");
+    scanf("%llx", &L);
+
+    K1 = generateK1_64(L);
+    K2 = generateK2_64(K1);
+
+    printf("K1 = %016llX\n", K1);
+    printf("K2 = %016llX\n", K2);
+
+    printf("\nConstants:\n");
+    printf("64-bit Rb = 0x1B\n");
+    printf("128-bit Rb = 0x87\n");
+
+    return 0;
+}
